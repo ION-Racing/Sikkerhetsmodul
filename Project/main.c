@@ -3,11 +3,13 @@
 #include "GPIO.h"
 #include "NVIC.h"
 #include "CAN.h"
+#include "EXTI.h"
+
 
 static void Delay(__IO uint32_t);
 CanTxMsg msgTx;	  
 CanRxMsg msgRx;
-			
+
 int main(void)
 {
 	// Configure the system clock.
@@ -20,21 +22,20 @@ int main(void)
 
 	
 	// Initialize peripheral modules
-	InitGPIO();
-	InitNVIC();
 	InitCAN();
+	InitGPIO();
+	InitEXTI();
+	InitNVIC();
 	
 	//Enable a LED to show on status.
-	GPIOC->ODR |= GPIO_Pin_8;
-	
+	//GPIOC->ODR |= GPIO_Pin_8;
+	//GPIOD->ODR |= GPIO_Pin_14;
 	/* Main code */
 	while(1)
 	{
 
 	}
 }
-
-
 
 //--------------------------------------------------------------------
 /**
