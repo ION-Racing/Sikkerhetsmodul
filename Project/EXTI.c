@@ -1,8 +1,8 @@
 #include "STM32f4xx.h"
+#include "Global_variables.h"
 
 void InitEXTI()
 {
-	
 	/*Configure GPIOs as EXTI:
 	PE7		: Start button  
 	PE8		: Stop button
@@ -23,14 +23,34 @@ void InitEXTI()
 	
 }
 
+
+uint32_t time1IT=0; //wheel sensor 1 interrupt time/delay
+uint32_t time2IT=0; //wheel sensor 1 interrupt time/delay
+uint32_t Ws_deltat = 0; //delta time between trigger 1 and trigger 2
+const uint8_t TRIGGER1=0; 
+const uint8_t TRIGGER2=1; 
+static uint8_t state = 0;
+/*
+Interrupt handlers for start-, stop- buttons, wheel sensor 1 and 2.
+Could probably make the interrupt routine a lot quicker, or solve
+the problem in a different manner.
+*/
+
 void EXTI9_5_IRQHandler(void) {
-    /* Make sure that interrupt flag is set */
-     if (EXTI_GetITStatus(EXTI_Line9) != RESET) {
-        /* Do your stuff when PD0 is changed */
-        
-        GPIOD->ODR ^= GPIO_Pin_14;
-        /* Clear interrupt flag */
+	
+			__disable_irq();
+     if (EXTI_GetITStatus(EXTI_Line9) != RESET) 		//Wheel sensor IT?
+			 { 
+				 if(state == TRIGGER1){																		
+					TIM2->CNT = 0; 																					 
+					state = TRIGGER2;
+				 }else{																			//Second trigger..
+					Ws_deltat = TIM2->CNT;
+					state = TRIGGER1;
+														//Reset counter
+				 }
         EXTI_ClearITPendingBit(EXTI_Line9);
+			 __enable_irq();
     } 
 }
  

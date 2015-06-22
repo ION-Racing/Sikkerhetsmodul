@@ -4,11 +4,14 @@
 #include "NVIC.h"
 #include "CAN.h"
 #include "EXTI.h"
+#include "TIM.h"
+#include "Global_variables.h"
 
 
 static void Delay(__IO uint32_t);
 CanTxMsg msgTx;	  
 CanRxMsg msgRx;
+uint32_t Ws_freq;
 
 int main(void)
 {
@@ -26,6 +29,7 @@ int main(void)
 	InitGPIO();
 	InitEXTI();
 	InitNVIC();
+	InitTim();
 	
 	//Enable a LED to show on status.
 	//GPIOC->ODR |= GPIO_Pin_8;
@@ -33,7 +37,15 @@ int main(void)
 	/* Main code */
 	while(1)
 	{
-
+		if(Ws_deltat != 0)
+			{
+		Ws_freq = 1000/Ws_deltat;
+				
+				if(Ws_freq > 1000) 
+				{
+						GPIOD->ODR |= GPIO_Pin_14;
+				}else GPIOD->ODR &= ~GPIO_Pin_14;
+			}
 	}
 }
 
