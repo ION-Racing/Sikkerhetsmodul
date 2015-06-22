@@ -26,7 +26,7 @@ void InitEXTI()
 
 uint32_t time1IT=0; //wheel sensor 1 interrupt time/delay
 uint32_t time2IT=0; //wheel sensor 1 interrupt time/delay
-uint32_t Ws_deltat = 0; //delta time between trigger 1 and trigger 2
+float Ws_deltat = 0; //delta time between trigger 1 and trigger 2
 const uint8_t TRIGGER1=0; 
 const uint8_t TRIGGER2=1; 
 static uint8_t state = 0;

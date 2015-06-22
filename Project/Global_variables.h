@@ -1,1 +1,1 @@
-extern uint32_t Ws_deltat;
+extern float Ws_deltat;

@@ -6,12 +6,13 @@
 #include "EXTI.h"
 #include "TIM.h"
 #include "Global_variables.h"
-
+#include "math.h"
 
 static void Delay(__IO uint32_t);
 CanTxMsg msgTx;	  
 CanRxMsg msgRx;
-uint32_t Ws_freq;
+float Ws_freq;
+uint32_t Freq1;
 
 int main(void)
 {
@@ -39,7 +40,8 @@ int main(void)
 	{
 		if(Ws_deltat != 0)
 			{
-		Ws_freq = 1000/Ws_deltat;
+				Ws_freq = round((1000000/Ws_deltat));
+				Freq1 = (uint32_t) round(Ws_freq);
 				
 				if(Ws_freq > 1000) 
 				{
