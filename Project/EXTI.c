@@ -12,6 +12,7 @@ void InitEXTI()
 	
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
 	
+	//Configure syscfg
 	SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOE, EXTI_PinSource7);
 	SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOE, EXTI_PinSource8);
 	SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOD, EXTI_PinSource9);
@@ -55,49 +56,47 @@ the problem in a different manner.
 void EXTI9_5_IRQHandler(void) {
 	
 			__disable_irq();
-     if (EXTI_GetITStatus(EXTI_Line9) != RESET) 		//Wheel sensor IT?
+     if (EXTI_GetITStatus(EXTI_Line9) != RESET) 			//Wheel sensor IT?
 			 { 
-				 if(wheel1_state == TRIGGER1){																		
-					wheel1_Dt_temporary = TIM2->CNT; 																					 
-					wheel1_state = TRIGGER2;
-				 }else{																			//Second trigger..
-					wheel1_Dt = TIM2->CNT - wheel1_Dt_temporary;
-					wheel1_state = TRIGGER1;
-														//Reset counter
+				 if(wheel1_state == TRIGGER1){								// First trigger?											
+					wheel1_Dt_temporary = TIM2->CNT; 						// Set reference time of first trigger
+	//				wheel1_Dt = 0;															// To prevent latching of values.
+					wheel1_state = TRIGGER2;										// Ready for state 2.
+				 }else{																				// Or second trigger..
+					wheel1_Dt = TIM2->CNT - wheel1_Dt_temporary;// Calculate time difference of trigger 1 and 2.
+					wheel1_state = TRIGGER1;										// Ready or state 1.												
 				 }
         EXTI_ClearITPendingBit(EXTI_Line9);
     } 
 			 
 		  if (EXTI_GetITStatus(EXTI_Line7) != RESET)		// START button IT 
 			{
-				GPIOA->ODR ^= GPIO_Pin_6; // TEMP ACTION!
+				GPIOA->ODR |= GPIO_Pin_6; // TEMP ACTION!
 				EXTI_ClearITPendingBit(EXTI_Line7);
 			}	
 				 
 			if (EXTI_GetITStatus(EXTI_Line8) != RESET)		// STOP button IT 
 			{
-				GPIOA->ODR ^= GPIO_Pin_5; // TEMP ACTION!
+				GPIOA->ODR |= GPIO_Pin_5; // TEMP ACTION!
 				EXTI_ClearITPendingBit(EXTI_Line8);
 			}			
-
 		__enable_irq();			
 }
  
 /* Handle PB12 interrupt */
 void EXTI15_10_IRQHandler(void) {
 	
-			__disable_irq();
-     if (EXTI_GetITStatus(EXTI_Line10) != RESET) 		//Wheel sensor IT?
+					__disable_irq();
+     if (EXTI_GetITStatus(EXTI_Line10) != RESET) 			//Wheel sensor IT?
 			 { 
-				 if(wheel2_state == TRIGGER1){																		
-					wheel2_Dt_temporary = TIM2->CNT; 																					 
-					wheel2_state = TRIGGER2;
-				 }else{																			//Second trigger..
-					wheel2_Dt = TIM2->CNT - wheel2_Dt_temporary;
-					wheel2_state = TRIGGER1;
-														//Reset counter
+				 if(wheel2_state == TRIGGER1){								// First trigger?											
+					wheel2_Dt_temporary = TIM2->CNT; 						// Set reference time of first trigger
+					wheel2_state = TRIGGER2;										// Ready for state 2.
+				 }else{																				// Or second trigger..
+					wheel2_Dt = TIM2->CNT - wheel2_Dt_temporary;// Calculate time difference of trigger 1 and 2.
+					wheel2_state = TRIGGER1;										// Ready or state 1.														
 				 }
         EXTI_ClearITPendingBit(EXTI_Line10);
-    } 
+    }
 			  __enable_irq();
 }

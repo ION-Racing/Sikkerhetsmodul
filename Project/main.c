@@ -47,7 +47,9 @@ int main(void)
 	while(1)
 	{
 		TxWheelrpm(wheel1_Dt,0x1);
+		wheel1_Dt = 0;
 		TxWheelrpm(wheel2_Dt,0x2);
+		wheel2_Dt = 0;
 	}
 }
 
