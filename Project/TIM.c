@@ -18,7 +18,6 @@ void	InitTim ()
 		TIM_TimeBaseInit(TIM2, &TIM_structinit);
 		
 		TIM_Cmd(TIM2,ENABLE);
-
 		
 	}
 	

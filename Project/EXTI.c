@@ -1,11 +1,11 @@
 #include "STM32f4xx.h"
 #include "Global_variables.h"
 
+struct wheel;
+
 void InitEXTI()
 {
 	/*Configure GPIOs as EXTI:
-	PE7		: Start button  
-	PE8		: Stop button
 	PD9		: Wheelsensor 1
 	PD10	: Wheelsensor 2
 	*/
@@ -13,10 +13,10 @@ void InitEXTI()
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
 	
 	//Configure syscfg
-	SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOE, EXTI_PinSource7);
-	SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOE, EXTI_PinSource8);
 	SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOD, EXTI_PinSource9);
 	SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOD, EXTI_PinSource10);
+	SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOE, EXTI_PinSource7);
+	SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOE, EXTI_PinSource8);
 	
 	EXTI_InitTypeDef EXTI_initstruct;
 	EXTI_initstruct.EXTI_Line = EXTI_Line9 | EXTI_Line10;
@@ -25,27 +25,32 @@ void InitEXTI()
 	EXTI_initstruct.EXTI_Trigger = EXTI_Trigger_Falling;
 	EXTI_Init(&EXTI_initstruct);
 	
+	EXTI_initstruct.EXTI_Line = EXTI_Line8 | EXTI_Line7;
+	EXTI_initstruct.EXTI_LineCmd = ENABLE;
+	EXTI_initstruct.EXTI_Mode = EXTI_Mode_Interrupt;
+	EXTI_initstruct.EXTI_Trigger = EXTI_Trigger_Rising_Falling;
+	EXTI_Init(&EXTI_initstruct);
+	
 }
 
+	#define TRIGGER1 0 
+	#define TRIGGER2 1 
+	#define debounceTime  10000 // t = debounceTime * 1us (= 10ms)
+		
+	 //Variables for wheelsensor interrupt	
+	uint32_t wp_temp1; // temporary delta time. 
+	uint32_t wp_temp2; // temporary delta time.
+	
+	//Variables for button push
+	uint32_t button_start_t1 = 0; //Initial time of start push
+	uint8_t  button_start_state; 
+	uint32_t button_stop_t1 = 0; // Inital time of stop push
+	uint8_t  button_stop_state;
+	uint8_t start_pushed =0;
+	uint8_t stop_pused = 0;
 
-//uint32_t time1IT=0; //wheel sensor 1 interrupt time/delay
-//uint32_t time2IT=0; //wheel sensor 1 interrupt time/delay
-//uint32_t Ws_deltat = 0; //delta time between trigger 1 and trigger 2
-//uint32_t Ws_deltatTemp = 0;
-//static uint8_t state = 0;
-
-const uint8_t TRIGGER1=0; 
-const uint8_t TRIGGER2=1; 
-
-
-	uint8_t	wheel1_state;				  // First or second trigger.
-	float wheel1_Dt;					  // Time between triggers.
-	uint32_t wheel1_Dt_temporary; // temporary delta time.
-
-
-	uint8_t	wheel2_state;				  // First or second trigger.
-	uint32_t wheel2_Dt;					  // Time between triggers.
-	uint32_t wheel2_Dt_temporary; // temporary delta time.
+	uint8_t start_button_pushed = 0;   
+	uint8_t stop_button_pushed = 0;
 
 /*
 Interrupt handlers for start-, stop- buttons, wheel sensor 1 and 2.
@@ -56,47 +61,69 @@ the problem in a different manner.
 void EXTI9_5_IRQHandler(void) {
 	
 			__disable_irq();
-     if (EXTI_GetITStatus(EXTI_Line9) != RESET) 			//Wheel sensor IT?
+		//Wheelsensor interrupt action
+     if (EXTI_GetITStatus(EXTI_Line9) != RESET) 	//Wheel sensor IT?
 			 { 
-				 if(wheel1_state == TRIGGER1){								// First trigger?											
-					wheel1_Dt_temporary = TIM2->CNT; 						// Set reference time of first trigger
-	//				wheel1_Dt = 0;															// To prevent latching of values.
-					wheel1_state = TRIGGER2;										// Ready for state 2.
-				 }else{																				// Or second trigger..
-					wheel1_Dt = TIM2->CNT - wheel1_Dt_temporary;// Calculate time difference of trigger 1 and 2.
-					wheel1_state = TRIGGER1;										// Ready or state 1.												
+				 if(wheel.state1 == TRIGGER1){						// First trigger?											
+					wp_temp1 = TIM2->CNT; 									// Set reference time of first trigger
+					wheel.state1 = TRIGGER2;								// Ready for state 2.
+				 }else{																		// Or second trigger..
+					wheel.period1 = TIM2->CNT - wp_temp1;		// Calculate time difference of trigger 1 and 2.
+					wheel.state1 = TRIGGER1;								// Ready or state 1.												
 				 }
         EXTI_ClearITPendingBit(EXTI_Line9);
-    } 
+    }
 			 
-		  if (EXTI_GetITStatus(EXTI_Line7) != RESET)		// START button IT 
+			//Start button interrupt action
+			if (EXTI_GetITStatus(EXTI_Line7) != RESET)
 			{
-				GPIOA->ODR |= GPIO_Pin_6; // TEMP ACTION!
+				if (button_start_state == 0)
+				{
+				button_start_t1 = TIM2->CNT;
+				button_start_state = 1;
+				}else{
+					if(TIM2->CNT - button_start_t1 > debounceTime)
+						{
+							start_button_pushed = 1;
+						}
+						button_start_state = 0;
+				}
 				EXTI_ClearITPendingBit(EXTI_Line7);
-			}	
-				 
-			if (EXTI_GetITStatus(EXTI_Line8) != RESET)		// STOP button IT 
-			{
-				GPIOA->ODR |= GPIO_Pin_5; // TEMP ACTION!
-				EXTI_ClearITPendingBit(EXTI_Line8);
-			}			
+			}
+			
+			//STOP button action
+		if (EXTI_GetITStatus(EXTI_Line8) != RESET){
+					if (button_stop_state == 0)
+				{
+				button_stop_t1 = TIM2->CNT;
+				button_stop_state = 1;
+				}else{
+					if(TIM2->CNT - button_stop_t1 > debounceTime)
+						{
+							stop_button_pushed = 1;
+						}
+						button_stop_state = 0;
+				}
+			EXTI_ClearITPendingBit(EXTI_Line8);
+		}
 		__enable_irq();			
 }
  
 /* Handle PB12 interrupt */
 void EXTI15_10_IRQHandler(void) {
 	
-					__disable_irq();
-     if (EXTI_GetITStatus(EXTI_Line10) != RESET) 			//Wheel sensor IT?
+	
+			__disable_irq();
+     if (EXTI_GetITStatus(EXTI_Line10) != RESET)	//Wheel sensor IT?
 			 { 
-				 if(wheel2_state == TRIGGER1){								// First trigger?											
-					wheel2_Dt_temporary = TIM2->CNT; 						// Set reference time of first trigger
-					wheel2_state = TRIGGER2;										// Ready for state 2.
-				 }else{																				// Or second trigger..
-					wheel2_Dt = TIM2->CNT - wheel2_Dt_temporary;// Calculate time difference of trigger 1 and 2.
-					wheel2_state = TRIGGER1;										// Ready or state 1.														
+				 if(wheel.state2 == TRIGGER1){						// First trigger?											
+					wp_temp2 = TIM2->CNT; 									// Set reference time of first trigger
+					wheel.state2 = TRIGGER2;								// Ready for state 2.
+				 }else{																		// Or second trigger..
+					wheel.period2 = TIM2->CNT - wp_temp2;		// Calculate time difference of trigger 1 and 2.
+					wheel.state2 = TRIGGER1;								// Ready or state 1.												
 				 }
         EXTI_ClearITPendingBit(EXTI_Line10);
-    }
-			  __enable_irq();
+    } 
+		__enable_irq();			
 }
