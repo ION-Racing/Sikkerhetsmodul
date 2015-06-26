@@ -35,7 +35,7 @@ void InitEXTI()
 
 	#define TRIGGER1 0 
 	#define TRIGGER2 1 
-	#define debounceTime  10000 // t = debounceTime * 1us (= 10ms)
+	#define debounceTime  25000 // t = debounceTime * 1us (= 10ms)
 		
 	 //Variables for wheelsensor interrupt	
 	uint32_t wp_temp1; // temporary delta time. 

@@ -7,6 +7,9 @@
 	
 void	InitTim ()
 	{
+		/*
+		Timer for interrupt purposes
+		*/
 		TIM_TimeBaseInitTypeDef TIM_structinit;
 		//Enable clock
 		RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);
@@ -19,6 +22,29 @@ void	InitTim ()
 		
 		TIM_Cmd(TIM2,ENABLE);
 		
+		/*
+		Timer for CAN-Watchdog
+		*/
+		//Enable clock
+		RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM4, ENABLE);
+		
+		TIM_structinit.TIM_Prescaler = 8400-1; // TIM2 = 1 Mhz
+		TIM_structinit.TIM_CounterMode = TIM_CounterMode_Up;
+		TIM_structinit.TIM_Period = 50000-1; //
+		TIM_structinit.TIM_ClockDivision = TIM_CKD_DIV1;
+		TIM_TimeBaseInit(TIM4, &TIM_structinit);
+		
+		TIM_ITConfig(TIM4,TIM_IT_Update,ENABLE);
+		
 	}
 	
-	
+void	TIM4_IRQHandler(void)
+{
+		__disable_irq();
+   if (TIM_GetITStatus(TIM4, TIM_IT_Update) != RESET)
+	 {
+		TIM_ClearITPendingBit(TIM4, TIM_IT_Update);
+		GPIOA->ODR ^= GPIO_Pin_6;
+	 }
+	 __enable_irq();
+}

@@ -409,6 +409,11 @@
           <GroupName>Main Source</GroupName>
           <Files>
             <File>
+              <FileName>CAN_transmissions.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\CAN_transmissions.c</FilePath>
+            </File>
+            <File>
               <FileName>main.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\main.c</FilePath>
@@ -417,6 +422,21 @@
               <FileName>Wheelsensor.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\Wheelsensor.c</FilePath>
+            </File>
+            <File>
+              <FileName>Global_variables.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Global_variables.h</FilePath>
+            </File>
+            <File>
+              <FileName>HMI_Buttons.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\HMI_Buttons.c</FilePath>
+            </File>
+            <File>
+              <FileName>CAN_messages.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\CAN_messages.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -630,6 +650,16 @@
               <FileName>TIM.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\TIM.c</FilePath>
+            </File>
+            <File>
+              <FileName>systick.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\systick.c</FilePath>
+            </File>
+            <File>
+              <FileName>Watchdog.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Watchdog.c</FilePath>
             </File>
           </Files>
         </Group>

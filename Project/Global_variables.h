@@ -14,6 +14,13 @@ in EXTI.C.
 extern uint8_t start_button_pushed;   
 extern uint8_t stop_button_pushed;
 
+/*
+state of the can bus echo
+1 Echo message on canbus sent.
+0 echo recived or message not sent yet.
+*/
+extern	uint8_t CAN_ECHO_SENT;
+
 typedef struct{
 	uint8_t 	state1		;	// state of wheelsensor 1
 	uint32_t 	period1		;	// Time between triggers for wheelsensor 1.

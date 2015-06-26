@@ -28,11 +28,20 @@ void InitNVIC(void)
 	/*Wheelsensor1 (PD9), Start button (PE7)
 	and stop button (PE8)
 	*/
-	NVIC_InitTypeDef NVIC_initstruct;
-	NVIC_initstruct.NVIC_IRQChannel = EXTI9_5_IRQn;
-	NVIC_initstruct.NVIC_IRQChannelPreemptionPriority = 0x00;
-	NVIC_initstruct.NVIC_IRQChannelSubPriority = 0x00;
-	NVIC_initstruct.NVIC_IRQChannelCmd = ENABLE;
-	NVIC_Init(&NVIC_initstruct);
 
+	NVIC_InitStructure.NVIC_IRQChannel = EXTI9_5_IRQn;
+	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x00;
+	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x02;
+	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+	NVIC_Init(&NVIC_InitStructure);
+
+
+	//TIM 4 interrupt
+	NVIC_InitStructure.NVIC_IRQChannel = TIM4_IRQn;
+	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x00;
+	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x03;
+	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+	NVIC_Init(&NVIC_InitStructure);
+	
+	
 }

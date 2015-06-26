@@ -12,6 +12,7 @@
 #include "systick.h"
 #include "watchdog.h"
 #include "CAN_messages.h"
+#include "CAN_transmissions.h"
 
 
 //Macros
@@ -52,7 +53,7 @@ int main(void)
 	InitNVIC();
 	InitTim();
 	InitSystick();
-	InitWatchdog(); //Disable watchdog while debugging.
+//	InitWatchdog(); //Disable watchdog while debugging.
 	
 	/* 
 	Check if the IWDG reset has occoured
@@ -63,27 +64,18 @@ int main(void)
 	}
 	
 	/*
-	Startup routine
-	*/
-	
-while(start_ack != ACK){
-	
-	if(clk100ms){
-		
-	}
-	IWDG_ReloadCounter();
-}
-	
-	/*
 	Main code
 	*/
-	while(STOP_BUTTON != ACK)
-	{
-		
-		if(newButtonPush(GPIO_Pin_8))
-			{
+	while(1)
+	{ 
+		if(newButtonPush(STOP_BUTTON))
+		{
 			GPIOA->ODR ^= GPIO_Pin_4;
-			}
+		}
+		if(newButtonPush(START_BUTTON))
+		{
+			GPIOA->ODR ^= GPIO_Pin_6;
+		}
 			
 		if(clk10msWheel == COMPLETE){
 		TxWheelrpm(TxMsg);
@@ -92,9 +84,11 @@ while(start_ack != ACK){
 		
 		if(clk1000ms == COMPLETE)
 		{
-			GPIOA->ODR ^= GPIO_Pin_5;
+			sendEchoCAN();
 			clk1000ms = RESTART;
 		}
+		
+		//if message recived -> parse...
 	} //END while1
 }	//END Main
 
