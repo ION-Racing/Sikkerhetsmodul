@@ -30,7 +30,11 @@ ID			D1		D2		D3		D4		D5
 will handle the CAN_watchdog on the 
 dinished software.
 */
-#define CAN_ECHO 0x30
+#define CAN_ECHO 0x30					//CAN echo message
+#define ECU_FAILED_ECHO 0x41 	//ECU did not respond	
+#define RPIU_FAILED_ECHO 0x42	//RPIU did not respond
+#define DU_FAILED_ECHO 0x43		//DU did not respond
+#define PU_FAILED_ECHO 0x44		//PU did not respond
 
 /* Temp macros, the safety module
 will handle the CAN_watchdog on the 

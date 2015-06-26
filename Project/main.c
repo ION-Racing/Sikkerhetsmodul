@@ -1,4 +1,3 @@
-
 //includes
 #include "stm32f4xx.h"
 #include "stm32f4xx_GPIO.h"
@@ -12,7 +11,7 @@
 #include "systick.h"
 #include "watchdog.h"
 #include "CAN_messages.h"
-#include "CAN_transmissions.h"
+#include "CAN_functions.h"
 
 
 //Macros
@@ -27,14 +26,14 @@ uint8_t newButtonPush(uint16_t);
 
 //Variable declerations
 wheeld wheel;
+RxCANd RxCAN;
 CanTxMsg TxMsg;	  
 CanRxMsg msgRx;
 uint8_t wdResetState;
 uint8_t start_ack=0;
 
 int main(void)
-{
-	
+{	
 	/*
 	Initalize and configure periphermodules and system.
 	*/
@@ -53,7 +52,8 @@ int main(void)
 	InitNVIC();
 	InitTim();
 	InitSystick();
-//	InitWatchdog(); //Disable watchdog while debugging.
+	initWatchdogCAN();
+	//InitWatchdog(); //Disable watchdog while debugging.
 	
 	/* 
 	Check if the IWDG reset has occoured
@@ -67,25 +67,13 @@ int main(void)
 	Main code
 	*/
 	while(1)
-	{ 
-		if(newButtonPush(STOP_BUTTON))
-		{
-			GPIOA->ODR ^= GPIO_Pin_4;
-		}
-		if(newButtonPush(START_BUTTON))
-		{
-			GPIOA->ODR ^= GPIO_Pin_6;
-		}
-			
+	{ 	
 		if(clk10msWheel == COMPLETE){
 		TxWheelrpm(TxMsg);
 		clk10msWheel = RESTART;
 		}
-		
-		if(clk1000ms == COMPLETE)
-		{
-			sendEchoCAN();
-			clk1000ms = RESTART;
+		if(newButtonPush(GPIO_Pin_7)){
+		GPIOA->ODR ^= GPIO_Pin_4;
 		}
 		
 		//if message recived -> parse...

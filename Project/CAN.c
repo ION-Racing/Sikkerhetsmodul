@@ -1,6 +1,8 @@
 #include "stm32f4xx_CAN.h"
 #include "stm32f4xx_gpio.h"
 #include "Periph_header.h"
+#include "Global_variables.h"
+#include "CAN_functions.h"
 
 #define CAN_RX_PIN GPIO_Pin_11
 #define CAN_TX_PIN GPIO_Pin_12
@@ -79,50 +81,18 @@ void InitCAN(void)
 	Init_RxMes(&msgRx);
 }
 
-/* CAN Transmit */
-
-uint8_t CANTx(uint32_t address, uint8_t length, uint8_t data[8]) {
-	
-	CanTxMsg msg;	  
-	msg.StdId 	= address;
-	msg.IDE 	= CAN_Id_Standard;
-	msg.RTR		= CAN_RTR_Data;
-	msg.DLC		= length;
-	
-	uint8_t i = 0;
-	for(i=0; i<length; i++){
-		msg.Data[i] = data[i];
-	}
-
-	return CAN_Transmit(CAN1, &msg);
-}
-
-/* CAN Receive */
-
-void Init_RxMes(CanRxMsg *RxMessage)
-{
-	uint8_t ubCounter = 0;
-
-	RxMessage->StdId = 0x00;
-	RxMessage->ExtId = 0x00;
-	RxMessage->IDE = CAN_ID_STD;
-	RxMessage->DLC = 0;
-	RxMessage->FMI = 0;
-	for (ubCounter = 0; ubCounter < 8; ubCounter++)
-	{
-		RxMessage->Data[ubCounter] = 0x00;
-	}
-}
-
-// CAN RX Interrupt
+/*
+CAN RX Interrupt
+*/
 void CAN1_RX0_IRQHandler (void)
 {
-	if (CAN1->RF0R & CAN_RF0R_FMP0){
-		
-		/* Temp action for testing CAN */
-		CAN_Receive(CAN1,CAN_FIFO0,&msgRx);
-
-		if(msgRx.StdId == 0x1) GPIOB->ODR ^= GPIO_Pin_14;
-
-	}
+	__disable_irq();
+	if (CAN_GetITStatus(CAN1,CAN_IT_FMP0) != RESET)
+		{
+			CANparseMessage(CAN_FIFO0);
+			RxCAN.FIFO0 = SET;
+			GPIOA->ODR ^= GPIO_Pin_5;
+			
+		}
+		__enable_irq();
 }

@@ -34,14 +34,6 @@ void InitNVIC(void)
 	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x02;
 	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
 	NVIC_Init(&NVIC_InitStructure);
-
-
-	//TIM 4 interrupt
-	NVIC_InitStructure.NVIC_IRQChannel = TIM4_IRQn;
-	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x00;
-	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x03;
-	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-	NVIC_Init(&NVIC_InitStructure);
 	
 	
 }
