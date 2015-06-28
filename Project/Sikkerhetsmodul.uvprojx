@@ -413,21 +413,6 @@
               <FileType>1</FileType>
               <FilePath>.\main.c</FilePath>
             </File>
-            <File>
-              <FileName>Wheelsensor.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Wheelsensor.c</FilePath>
-            </File>
-            <File>
-              <FileName>HMI_Buttons.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\HMI_Buttons.c</FilePath>
-            </File>
-            <File>
-              <FileName>ringbuffer.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\ringbuffer.c</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -442,6 +427,11 @@
               <FileName>Global_variables.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\Global_variables.h</FilePath>
+            </File>
+            <File>
+              <FileName>Macros.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Macros.h</FilePath>
             </File>
           </Files>
         </Group>

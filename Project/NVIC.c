@@ -18,7 +18,17 @@ void InitNVIC(void)
 	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
 	NVIC_Init(&NVIC_InitStructure);
 	
-	//Wheelsensor2 (PD10) interrupt. 
+	/*
+	FLT inputs, all of the faults are active high. i.e. if a
+	fault occours the signal goes low. If a fault occours the 
+	microcontroller should respons by opening the shutdown circuit;
+	see shutdown.c
+	----------------------------------------------------------------
+	PD8		:	BMS FLT
+	PD9 	:	IMD FLT
+	PD10	:	BSPD FLT
+	*/
+ 
 	NVIC_InitStructure.NVIC_IRQChannel = EXTI15_10_IRQn;
 	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x0;
 	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x01;

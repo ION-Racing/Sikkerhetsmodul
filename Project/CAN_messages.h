@@ -17,18 +17,11 @@ ID			D1		D2		D3		D4		D5
 0x600		-			-			-			-			-
 
 */
-#define TX_WHEELSENSOR	0x200
-#define Tx_STOP					0x40
-#define Tx_START				0x41
+
 #define TX_IWD_TIMEOUT	0x600
 
-/* Rx list */
-#define RX_START_ACK 0x0
-#define RX_STOP_ACK 0x0
-#define	CRITICAL_ERROR 0x0
-/* Temp macros, the safety module
-will handle the CAN_watchdog on the 
-dinished software.
+/*
+CAN transmit messages
 */
 #define CAN_ECHO 0x30					//CAN echo message
 #define ECU_FAILED_ECHO 0x41 	//ECU did not respond	
@@ -36,13 +29,8 @@ dinished software.
 #define DU_FAILED_ECHO 0x43		//DU did not respond
 #define PU_FAILED_ECHO 0x44		//PU did not respond
 
-/* Temp macros, the safety module
-will handle the CAN_watchdog on the 
-dinished software.
------------------------------------
-Safety module will "bark" on the CAN-
-Bus and give out an ERROR if all the modules
-doesn't "kick the can" in a timely fashion.
+/*
+CAN recive messages
 */
 #define ECU_KICKED_CAN 	0x31 		// Engine Control Unit
 #define RPIU_KICKED_CAN 0x32 		// RPI Unit

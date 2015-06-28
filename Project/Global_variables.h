@@ -21,16 +21,40 @@ state of the can bus echo
 */
 extern	uint8_t CAN_ECHO_SENT;
 
+/*
+Typedef for global interrupt variables.
+*/
 typedef struct{
-	uint8_t 	state1		;	// state of wheelsensor 1
-	uint32_t 	period1		;	// Time between triggers for wheelsensor 1.
-	uint8_t		state2		;	// state of wheelsensor 2.
-	uint32_t 	period2		;	// Time between triggers for wheelsensor 2.
-}wheeld;
+	
+	struct{
+		uint32_t timeStamp;
+		uint8_t fault;
+	}BMS;
+	
+	struct{
+		uint32_t timeStamp;
+		uint8_t fault;
+	}IMD;
+	
+	struct{
+		uint32_t timeStamp;
+		uint8_t fault;
+	}BSPD;
 
+	struct{
+		uint32_t done;
+		uint8_t fault;
+	}PREd;
+	
+	struct{
+		uint8_t open;
+		uint8_t closed;
+		uint8_t triggered;
+	}shutdownCircuit;
+	
+}IOinterruptd;
 
-extern wheeld wheel;
-
+extern IOinterruptd IOinterrupt;
 /*
 struct for CAN ECHO/Watchdog state.
 1 if echo recived.

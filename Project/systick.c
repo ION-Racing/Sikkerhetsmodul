@@ -1,7 +1,5 @@
 #include "stm32f4xx.h"
-
-const uint8_t COMPLETE = 0;
-const uint8_t RESTART = 1;
+#include "Macros.h"
 
 void InitSystick(void) {
 	

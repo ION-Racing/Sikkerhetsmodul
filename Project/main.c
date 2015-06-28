@@ -12,25 +12,17 @@
 #include "watchdog.h"
 #include "CAN_messages.h"
 #include "CAN_functions.h"
-
+#include "Macros.h"
 
 //Macros
 #define ACK 1
-#define START_BUTTON GPIO_Pin_7
-#define STOP_BUTTON GPIO_Pin_8
-
-//function declerations
-void TxWheelrpm(CanTxMsg);
-uint32_t calculateRpm(uint32_t);
-uint8_t newButtonPush(uint16_t);
+//Function protoypes
+void LEDtoggle(uint16_t LED);
 
 //Variable declerations
-wheeld wheel;
 RxCANd RxCAN;
 CanTxMsg TxMsg;	  
 CanRxMsg msgRx;
-uint8_t wdResetState;
-uint8_t start_ack=0;
 
 int main(void)
 {	
@@ -46,37 +38,34 @@ int main(void)
 	RCC_PCLK1Config(RCC_HCLK_Div4); // Set APB1=42Mhz (168/4)
 
 	// Initialize peripheral modules
-	InitCAN();
+//	InitCAN();
 	InitGPIO();
-	InitEXTI();
-	InitNVIC();
-	InitTim();
+//	InitEXTI();
+//	InitNVIC();
+//	InitTim();
 	InitSystick();
-	initWatchdogCAN();
-	//InitWatchdog(); //Disable watchdog while debugging.
+//	//initWatchdogCAN();
+//	//InitWatchdog(); //Disable watchdog while debugging.
 	
 	/* 
 	Check if the IWDG reset has occoured
 	*/
 	if(RCC_GetFlagStatus(RCC_FLAG_IWDGRST) == SET){
-		GPIOA->ODR |= GPIO_Pin_6; //temp action
+
 		RCC_ClearFlag();
 	}
 	
 	/*
 	Main code
 	*/
+	int i = 0;
 	while(1)
-	{ 	
-		if(clk10msWheel == COMPLETE){
-		TxWheelrpm(TxMsg);
-		clk10msWheel = RESTART;
-		}
-		if(newButtonPush(GPIO_Pin_7)){
-		GPIOA->ODR ^= GPIO_Pin_4;
-		}
-		
-		//if message recived -> parse...
+	{ 
+		if(clk1000ms==COMPLETE){
+		GPIOD->ODR ^= GPIO_Pin_15;
+			GPIOD->ODR ^= GPIO_Pin_0;
+		clk1000ms = RESTART;
+		}	
 	} //END while1
 }	//END Main
 
