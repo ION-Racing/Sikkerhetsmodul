@@ -58,12 +58,10 @@ int main(void)
 	/*
 	Main code
 	*/
-	int i = 0;
 	while(1)
 	{ 
 		if(clk1000ms==COMPLETE){
 		GPIOD->ODR ^= GPIO_Pin_15;
-			GPIOD->ODR ^= GPIO_Pin_0;
 		clk1000ms = RESTART;
 		}	
 	} //END while1
