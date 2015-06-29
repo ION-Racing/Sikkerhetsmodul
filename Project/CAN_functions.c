@@ -58,11 +58,11 @@ Echo function
 	void CANsendEcho()
 	{
 		//Reset Echo status struct
-		CANecho.isSent	= 1;
-		CANecho.DU 			= 0;
-		CANecho.ECU  		= 0;
-		CANecho.PU 	 		= 0;
-		CANecho.RPIU 		= 0;	
+		CANecho.isSent = 1;
+		CANecho.DU = 0;
+		CANecho.ECU = 0;
+		CANecho.PU = 0;
+		CANecho.RPIU = 0;	
 		CANTx(CAN_ECHO,0,0);
 		
 	}
