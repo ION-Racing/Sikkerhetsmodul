@@ -14,7 +14,7 @@
         <TargetCommonOption>
           <Device>STM32F407VGTx</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32F4xx_DFP.2.5.0</PackID>
+          <PackID>Keil.STM32F4xx_DFP.2.4.0</PackID>
           <PackURL>http://www.keil.com/pack</PackURL>
           <Cpu>IROM(0x08000000,0x100000) IRAM(0x20000000,0x20000) IRAM2(0x10000000,0x10000) CPUTYPE("Cortex-M4") FPU2 CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -84,8 +84,6 @@
             <UserProg2Name></UserProg2Name>
             <UserProg1Dos16Mode>0</UserProg1Dos16Mode>
             <UserProg2Dos16Mode>0</UserProg2Dos16Mode>
-            <nStopA1X>0</nStopA1X>
-            <nStopA2X>0</nStopA2X>
           </AfterMake>
           <SelectedForBatchBuild>0</SelectedForBatchBuild>
           <SVCSIdString></SVCSIdString>
@@ -149,7 +147,7 @@
             <RestoreSysVw>1</RestoreSysVw>
           </Target>
           <RunDebugAfterBuild>0</RunDebugAfterBuild>
-          <TargetSelection>-1</TargetSelection>
+          <TargetSelection>11</TargetSelection>
           <SimDlls>
             <CpuDll></CpuDll>
             <CpuDllArguments></CpuDllArguments>
@@ -363,8 +361,6 @@
             <uSurpInc>0</uSurpInc>
             <uC99>1</uC99>
             <useXO>0</useXO>
-            <v6Lang>0</v6Lang>
-            <v6LangP>0</v6LangP>
             <VariousControls>
               <MiscControls></MiscControls>
               <Define>USE_STDPERIPH_DRIVER,STM32F4XX,HSE_VALUE=8000000</Define>
@@ -657,6 +653,11 @@
               <FileType>1</FileType>
               <FilePath>.\ADC.c</FilePath>
             </File>
+            <File>
+              <FileName>USART.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\USART.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -671,6 +672,31 @@
               <FileName>CAN_functions.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\CAN_functions.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Sensors</GroupName>
+          <Files>
+            <File>
+              <FileName>GLV.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\GLV.c</FilePath>
+            </File>
+            <File>
+              <FileName>Current.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Current.c</FilePath>
+            </File>
+            <File>
+              <FileName>HV.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\HV.c</FilePath>
+            </File>
+            <File>
+              <FileName>sensors.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\sensors.h</FilePath>
             </File>
           </Files>
         </Group>

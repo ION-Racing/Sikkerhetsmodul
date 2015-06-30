@@ -1,29 +1,29 @@
 #include "stm32f4xx_gpio.h"
 #include "CAN.h"
+#include "sensors.h"
 
-//#define BUFFERSIZE 448  // Setter opp st¯rrelsen pÂ ADC array.
-#define BUFFERSIZE  (6)*4
+#define N_SENSORS 6
+#define	MOVING_AVERAGE_LENGTH 12
+#define BUFFERSIZE  (N_SENSORS)*MOVING_AVERAGE_LENGTH
 
 // ADC-values
 __IO uint16_t ADCDualConvertedValues[BUFFERSIZE];
 
-uint16_t rawSensorValues[6];
+uint16_t rawSensorValues[N_SENSORS];
 
 void InitADC(void){
 	
 	/*
 		Sensor				Pin		Pin function	 Sensor function
-		----------------------------------------------------------------------------
-		GLV_Sensor			PA2		-				12V battery monitoring								
-		HV_sensor			PA3		-				400V battery monitoring
-		Straumsensor_neg	PA4		-				400V battery current monitoring
-		Straumsensor_pos	PA5	 	-				400V battery current monitoring
-		Termistor coolant	PA6		-				Coolant temperature monitoring
-		Termistor 2			PA7		-				Extra termistor input if needed
-	
+		-------------------------------------------------------------
+		12V Sensor			PA2		
+		HV Sensor			PA3	
+		Straumsensor -		PA4	
+		Straumsensor +		PA5	
+		Termistor vann		PA6
+		Termistor 2			PA7
 		Two ADC-modules are used, ADC1 for channel 2, 3, 4 & 1, and ADC2 for channel 5, 6, 7.
-		After conversion the values are transferred to ADCDualConvertedValues via DMA in the 
-	following order (Dual ADC Mode, DMA Mode 1):
+		After conversion the values are transferred to ADCDualConvertedValues via DMA in the following order (Dual ADC Mode, DMA Mode 1):
 		CH2, CH5, CH3, CH6, CH4, CH7, CH1
 	*/
 	
@@ -31,21 +31,13 @@ void InitADC(void){
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
 	
 	GPIO_InitTypeDef GPIO_InitStructure;
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_2 | GPIO_Pin_3 | GPIO_Pin_4 |
-		GPIO_Pin_5 | GPIO_Pin_6 | GPIO_Pin_7;
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_2 | GPIO_Pin_4 | GPIO_Pin_5 | GPIO_Pin_6 | GPIO_Pin_7;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AN;
 	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
 	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL ;
 	GPIO_Init(GPIOA, &GPIO_InitStructure);
-	
-	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0;
-	GPIO_Init(GPIOB, &GPIO_InitStructure);
-	
-	
-	
-	
+		
 	// Configure NVIC
 	NVIC_InitTypeDef NVIC_InitStructure;
 
@@ -112,22 +104,22 @@ void InitADC(void){
 	ADC_Init(ADC1, &ADC_InitStructure);
 	ADC_Init(ADC2, &ADC_InitStructure); // Mirror on ADC2
 
-	/* ADC1 regular channel 11 configuration */
+	/* ADC1/ADC2 Regular channel configuration */
 	ADC_RegularChannelConfig(ADC1, ADC_Channel_2, 1, ADC_SampleTime_480Cycles); // PA2
 	ADC_RegularChannelConfig(ADC2, ADC_Channel_3, 1, ADC_SampleTime_480Cycles); // PA3
-	ADC_RegularChannelConfig(ADC1, ADC_Channel_4, 1, ADC_SampleTime_480Cycles); // PA4
-	/* ADC2 regular channel 12 configuration */
+	
+	ADC_RegularChannelConfig(ADC1, ADC_Channel_4, 2, ADC_SampleTime_480Cycles); // PA4
 	ADC_RegularChannelConfig(ADC2, ADC_Channel_5, 2, ADC_SampleTime_480Cycles); // PA5
-	ADC_RegularChannelConfig(ADC2, ADC_Channel_6, 2, ADC_SampleTime_480Cycles); // PA6
-	ADC_RegularChannelConfig(ADC2, ADC_Channel_7, 2, ADC_SampleTime_480Cycles); // PA7
+	
+	ADC_RegularChannelConfig(ADC1, ADC_Channel_6, 3, ADC_SampleTime_480Cycles); // PA6
+	ADC_RegularChannelConfig(ADC2, ADC_Channel_7, 3, ADC_SampleTime_480Cycles); // PA7
+
 	/* Enable DMA request after last transfer (Multi-ADC mode)  */
 	ADC_MultiModeDMARequestAfterLastTransferCmd(ENABLE);
 
 	// Enable ADC
 	ADC_Cmd(ADC1, ENABLE);
 	ADC_Cmd(ADC2, ENABLE);
-	
-	
 	
 	
 	// Setup TIM2 for ADC conversion triggering
@@ -152,29 +144,30 @@ uint8_t test = 0;
 /* DMA Interrupt */
 void DMA2_Stream0_IRQHandler(void)
 { 
+	__disable_irq();
 	// DMA Stream Transfer Complete Every 2kHz
 	if(DMA_GetITStatus(DMA2_Stream0, DMA_IT_TCIF0)){
 		DMA_ClearITPendingBit(DMA2_Stream0, DMA_IT_TCIF0);
 		
-		for (uint8_t i = 0; i < 6; i++)
-		{
-			for (uint8_t j = i; j < 24; j+=6)
-			{
-				rawSensorValues[i] += ADCDualConvertedValues[j];
+	// Apply filtering
+		uint32_t sampleSum[N_SENSORS];
+		for(uint8_t sensor = 0; sensor<N_SENSORS; sensor++){
+			sampleSum[sensor] = 0;
+			for(uint8_t i = 0; i<MOVING_AVERAGE_LENGTH; i++){
+				sampleSum[sensor] += ADCDualConvertedValues[sensor + N_SENSORS*i];
 			}
-			rawSensorValues[i] = rawSensorValues[i]>>1;
+			
+			uint16_t result = sampleSum[sensor] / MOVING_AVERAGE_LENGTH;
+			rawSensorValues[sensor] = result;
+			
+			processGLV(rawSensorValues[0]);
+			processHV(rawSensorValues[1]);
+//			processCurrent(rawSensorValues[2],rawSensorValues[3]);
+//			processTermistors(rawSensorValues[4],rawSensorValues[5]);
+			
 		}
-
-		
-		
-		uint8_t i;
-		uint8_t data[8];
-		for(i = 0; i<7; i++){
-			data[i] = (uint8_t)(rawSensorValues[i] >> 7);
-		}
-				
-		//movingAverage(ADCDualConvertedValues);
 	}
+	__enable_irq();
 }
 
 

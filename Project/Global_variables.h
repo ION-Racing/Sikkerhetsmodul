@@ -79,6 +79,3 @@ uint8_t FIFO1	; //Message pending in FIFO1
 }RxCANd;
 
 extern RxCANd RxCAN;
-
-
-

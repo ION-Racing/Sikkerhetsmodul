@@ -13,6 +13,8 @@
 #include "CAN_messages.h"
 #include "CAN_functions.h"
 #include "Macros.h"
+#include "ADC.h"
+#include "USART.h"
 
 //Macros
 #define ACK 1
@@ -38,14 +40,16 @@ int main(void)
 	RCC_PCLK1Config(RCC_HCLK_Div4); // Set APB1=42Mhz (168/4)
 
 	// Initialize peripheral modules
-//	InitCAN();
+	InitCAN();
 	InitGPIO();
 //	InitEXTI();
 //	InitNVIC();
 //	InitTim();
 	InitSystick();
+	InitADC();
 //	//initWatchdogCAN();
 //	//InitWatchdog(); //Disable watchdog while debugging.
+	
 	
 	/* 
 	Check if the IWDG reset has occoured
@@ -58,11 +62,14 @@ int main(void)
 	/*
 	Main code
 	*/
+	int UARTmsg = 1;
 	while(1)
-	{ 
+	{
 		if(clk1000ms==COMPLETE){
 		GPIOD->ODR ^= GPIO_Pin_15;
 		clk1000ms = RESTART;
+		USART_SendData(USART1,UARTmsg);
+			UARTmsg++;
 		}	
 	} //END while1
 }	//END Main
