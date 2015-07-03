@@ -3,7 +3,7 @@
 #include "sensors.h"
 
 #define N_SENSORS 6
-#define	MOVING_AVERAGE_LENGTH 12
+#define	MOVING_AVERAGE_LENGTH 4
 #define BUFFERSIZE  (N_SENSORS)*MOVING_AVERAGE_LENGTH
 
 // ADC-values
@@ -161,9 +161,9 @@ void DMA2_Stream0_IRQHandler(void)
 			rawSensorValues[sensor] = result;
 			
 			processGLV(rawSensorValues[0]);
-			processHV(rawSensorValues[1]);
-//			processCurrent(rawSensorValues[2],rawSensorValues[3]);
-//			processTermistors(rawSensorValues[4],rawSensorValues[5]);
+			//processHV(rawSensorValues[1]);
+			processPower(rawSensorValues[3],rawSensorValues[2],rawSensorValues[1]);
+			processTermistors(rawSensorValues[4],rawSensorValues[5]);
 			
 		}
 	}
