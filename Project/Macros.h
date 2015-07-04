@@ -3,5 +3,3 @@
 #define LED3 GPIO_Pin_15
 
 
-#define COMPLETE 0
-#define RESTART 1

@@ -1,6 +1,5 @@
 #include "stm32f4xx.h"
 #include "stm32f4xx_CAN.h"
-#include "CAN_messages.h"
 #include "Global_variables.h"
 #include "watchdog.h"
 
