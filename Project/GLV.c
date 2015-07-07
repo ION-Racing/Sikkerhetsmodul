@@ -45,11 +45,12 @@ void processGLV(uint16_t rawVoltage)
 	else
 		counterLow = 0;
 
-	if (clk1000msGLV == COMPLETE)
-	{
+	if (clk1000msGLV == COMPLETE){
 		clk1000msGLV = RESET;
-		voltageGLV = rawVoltage*GLV_MULT_FACTOR;	
-		uint8_t LVBat[2] = {voltageGLV & 0xFF, voltageGLV>>8};
+		
+		voltageGLV = rawVoltage * GLV_MULT_FACTOR;	
+		
+		uint8_t LVBat[2] = {voltageGLV >> 8, voltageGLV & 0xFF};
 		CANTx(CAN_MSG_LV_SENSOR, 2, LVBat);
 	}
 }

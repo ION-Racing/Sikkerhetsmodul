@@ -36,11 +36,12 @@ int main(void)
 	// Initialize peripheral modules
 	InitCAN();
 	InitGPIO();
+	InitSystick();
+	InitADC();
+	
 //	InitEXTI();
 //	InitNVIC();
 //	InitTim();
-	InitSystick();
-	InitADC();
 //	//initWatchdogCAN();
 //	//InitWatchdog(); //Disable watchdog while debugging.
 	

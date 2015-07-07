@@ -163,8 +163,8 @@ void DMA2_Stream0_IRQHandler(void)
 			
 			processGLV(rawSensorValues[0]);
 			//processHV(rawSensorValues[1]);
-			processPower(rawSensorValues[3],rawSensorValues[2],rawSensorValues[1]);
-			processTermistors(rawSensorValues[4],rawSensorValues[5]);
+			processPower(rawSensorValues[3], rawSensorValues[2], rawSensorValues[1]);
+			processTermistors(rawSensorValues[4], rawSensorValues[5]);
 			
 		}
 	}

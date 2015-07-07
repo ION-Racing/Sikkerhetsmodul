@@ -1,4 +1,4 @@
-// ION CAN Messages v8 - 2015-07-05
+// ION CAN Messages v9 - 2015-07-07
 
 #define	CAN_ERR_HV_SHUTDOWN								0x000
 #define	CAN_ERR_IMD										0x001
@@ -8,12 +8,12 @@
 #define	CAN_MSG_PRECHARGE								0x010
 #define	CAN_MSG_CURRENT_SENSOR_CALIBRATE				0x012
 #define	CAN_MSG_CURRENT SENSOR_CALIBRATION_COMPLETE		0x013
-#define	CAN_MSG_LV_SENSOR								0x015
+
 #define	CAN_MSG_POWER									0x016
 
-#define	CAN_MSG_MOTOR_LEFT_RX							0x181
+#define	CAN_MSG_MOTOR_LEFT_RX							0x190
 #define	CAN_MSG_MOTOR_RIGHT_RX							0x182
-#define	CAN_MSG_MOTOR_LEFT_TX							0x201
+#define	CAN_MSG_MOTOR_LEFT_TX							0x210
 #define	CAN_MSG_MOTOR_RIGHT_TX							0x202
 
 #define	CAN_ERR_PEDALS_IMPLAUSIBILITY					0x300
@@ -28,8 +28,14 @@
 #define	CAN_MSG_WHEEL_RPM_FRONT							0x450
 #define	CAN_MSG_SPEED									0x460
 
+#define	CAN_MSG_WATCHDOG_REQUEST						0x500
+#define	CAN_MSG_WATCHDOG_REPLY_PEDALS					0x501
+#define	CAN_MSG_WATCHDOG_REPLY_ECU						0x502
+#define	CAN_MSG_WATCHDOG_REPLY_DASHBOARD				0x503
+
 #define	CAN_MSG_HV_SENSOR								0x600
-#define	CAN_MSG_CURRENT_SENSOR							0x601
+#define	CAN_MSG_LV_SENSOR								0x601
+#define	CAN_MSG_CURRENT_SENSOR							0x602
 
 #define	CAN_MSG_BMS_PRODUCT								0x620
 #define	CAN_MSG_BMS_REVISION							0x621

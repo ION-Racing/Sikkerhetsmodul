@@ -68,7 +68,7 @@ void processPower(uint16_t I_pos, uint16_t I_neg, uint16_t rawData)
 		clk1000msHV = RESET;
 		
 		// Send HV sensor value
-		uint8_t HVBat[2] = {vbat>>8, vbat & 0xFF};
+		uint8_t HVBat[2] = {vbat >> 8, vbat & 0xFF};
 		CANTx(CAN_MSG_HV_SENSOR, 2, HVBat);
 	}
 	
