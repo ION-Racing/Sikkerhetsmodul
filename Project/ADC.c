@@ -1,6 +1,7 @@
 #include "stm32f4xx_gpio.h"
 #include "CAN.h"
 #include "sensors.h"
+#include "Temp.h"
 
 #define N_SENSORS 6
 #define	MOVING_AVERAGE_LENGTH 4
@@ -22,6 +23,7 @@ void InitADC(void){
 		Straumsensor +		PA5	
 		Termistor vann		PA6
 		Termistor 2			PA7
+	
 		Two ADC-modules are used, ADC1 for channel 2, 3, 4 & 1, and ADC2 for channel 5, 6, 7.
 		After conversion the values are transferred to ADCDualConvertedValues via DMA in the following order (Dual ADC Mode, DMA Mode 1):
 		CH2, CH5, CH3, CH6, CH4, CH7, CH1
@@ -106,12 +108,11 @@ void InitADC(void){
 
 	/* ADC1/ADC2 Regular channel configuration */
 	ADC_RegularChannelConfig(ADC1, ADC_Channel_2, 1, ADC_SampleTime_480Cycles); // PA2
-	ADC_RegularChannelConfig(ADC2, ADC_Channel_3, 1, ADC_SampleTime_480Cycles); // PA3
-	
 	ADC_RegularChannelConfig(ADC1, ADC_Channel_4, 2, ADC_SampleTime_480Cycles); // PA4
-	ADC_RegularChannelConfig(ADC2, ADC_Channel_5, 2, ADC_SampleTime_480Cycles); // PA5
-	
 	ADC_RegularChannelConfig(ADC1, ADC_Channel_6, 3, ADC_SampleTime_480Cycles); // PA6
+	
+	ADC_RegularChannelConfig(ADC2, ADC_Channel_3, 1, ADC_SampleTime_480Cycles); // PA3
+	ADC_RegularChannelConfig(ADC2, ADC_Channel_5, 2, ADC_SampleTime_480Cycles); // PA5
 	ADC_RegularChannelConfig(ADC2, ADC_Channel_7, 3, ADC_SampleTime_480Cycles); // PA7
 
 	/* Enable DMA request after last transfer (Multi-ADC mode)  */
@@ -139,19 +140,19 @@ void InitADC(void){
 	TIM_Cmd(TIM2, ENABLE);
 }
 
-uint8_t test = 0;
-
 /* DMA Interrupt */
 void DMA2_Stream0_IRQHandler(void)
 { 
 	__disable_irq();
+	
 	// DMA Stream Transfer Complete Every 2kHz
 	if(DMA_GetITStatus(DMA2_Stream0, DMA_IT_TCIF0)){
 		DMA_ClearITPendingBit(DMA2_Stream0, DMA_IT_TCIF0);
 		
-	// Apply filtering
+		// Apply filtering
 		uint32_t sampleSum[N_SENSORS];
-		for(uint8_t sensor = 0; sensor<N_SENSORS; sensor++){
+		for(uint8_t sensor = 0; sensor<N_SENSORS; sensor++)
+		{
 			sampleSum[sensor] = 0;
 			for(uint8_t i = 0; i<MOVING_AVERAGE_LENGTH; i++){
 				sampleSum[sensor] += ADCDualConvertedValues[sensor + N_SENSORS*i];

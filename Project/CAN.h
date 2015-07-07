@@ -33,10 +33,10 @@ CAN transmit messages
 #define DU_FAILED_ECHO 0x43		//DU did not respond
 #define PU_FAILED_ECHO 0x44		//PU did not respond
 
-#define CAN_MSG_CURRENT_SENSOR 0x011	
+/*#define CAN_MSG_CURRENT_SENSOR 0x011	
 #define CAN_MSG_HV_SENSOR 0x014
 #define CAN_MSG_LV_SENSOR 0x015	
-#define CAN_MSG_POWER 0x016
+#define CAN_MSG_POWER 0x016*/
 
 
 /*

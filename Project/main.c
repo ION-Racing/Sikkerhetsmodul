@@ -12,14 +12,11 @@
 #include "watchdog.h"
 #include "CAN_messages.h"
 #include "CAN_functions.h"
-#include "Macros.h"
 #include "ADC.h"
 #include "USART.h"
 
 //Macros
 #define ACK 1
-//Function protoypes
-void LEDtoggle(uint16_t LED);
 
 //Variable declerations
 RxCANd RxCAN;
@@ -27,10 +24,7 @@ CanTxMsg TxMsg;
 CanRxMsg msgRx;
 
 int main(void)
-{	
-	/*
-	Initalize and configure periphermodules and system.
-	*/
+{
 	// Configure the system clock.
 	// The system clock is 168Mhz.
 	RCC_HSEConfig(RCC_HSE_ON); // ENABLE HSE (HSE = 8Mhz)
@@ -51,28 +45,21 @@ int main(void)
 //	//InitWatchdog(); //Disable watchdog while debugging.
 	
 	
-	/* 
-	Check if the IWDG reset has occoured
-	*/
+	// Check if the IWDG reset has occured
 	if(RCC_GetFlagStatus(RCC_FLAG_IWDGRST) == SET){
-
 		RCC_ClearFlag();
 	}
 	
-	/*
-	Main code
-	*/
 	int UARTmsg = 1;
-	while(1)
-	{
-		if(clk1000ms==COMPLETE){
-		GPIOD->ODR ^= GPIO_Pin_15;
-		clk1000ms = RESTART;
-		USART_SendData(USART1,UARTmsg);
+	while(1){
+		if(clk1000ms == COMPLETE)
+		{
+			GPIOD->ODR ^= GPIO_Pin_15;
+			
+			USART_SendData(USART1, UARTmsg);
 			UARTmsg++;
+			
+			clk1000ms = RESTART;
 		}	
-	} //END while1
-}	//END Main
-
-
-
+	}
+}

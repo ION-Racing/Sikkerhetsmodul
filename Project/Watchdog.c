@@ -3,6 +3,7 @@
 #include "Global_variables.h"
 #include "CAN_functions.h"
 #include "CAN_messages.h"
+#include "CAN.h"
 
 /*
 Configuration of the independent watchdog.

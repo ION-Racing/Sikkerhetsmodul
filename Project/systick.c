@@ -1,10 +1,9 @@
 #include "stm32f4xx.h"
-#include "systick.h" 
-#include "Macros.h"
+#include "systick.h"
 
 void InitSystick(void) {
 	
-	SysTick_Config(SystemCoreClock/1000); 		
+	SysTick_Config(SystemCoreClock / 1000); 		
 }
 
 

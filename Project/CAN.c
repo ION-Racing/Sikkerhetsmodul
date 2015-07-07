@@ -7,14 +7,6 @@
 #define CAN_RX_PIN GPIO_Pin_11
 #define CAN_TX_PIN GPIO_Pin_12
 
-/* PRIVATE functions */
-CAN_InitTypeDef        CAN_InitStructure;
-CAN_FilterInitTypeDef  CAN_FilterInitStructure;
-CanTxMsg TxMessage; //Used for testing
-
-
-extern CanRxMsg msgRx;
-
 void InitCAN(void)
 {
 	// Setup CAN Pins
@@ -40,6 +32,7 @@ void InitCAN(void)
 	CAN_DeInit(CAN1);
 
 	/* CAN cell init */
+	CAN_InitTypeDef CAN_InitStructure;
 	CAN_InitStructure.CAN_TTCM = DISABLE;
 	CAN_InitStructure.CAN_ABOM = DISABLE;
 	CAN_InitStructure.CAN_AWUM = DISABLE;
@@ -56,6 +49,7 @@ void InitCAN(void)
 	CAN_Init(CAN1, &CAN_InitStructure);
 
 	/* CAN filter init */
+	CAN_FilterInitTypeDef CAN_FilterInitStructure;
 	CAN_FilterInitStructure.CAN_FilterNumber = 0;
 	CAN_FilterInitStructure.CAN_FilterMode = CAN_FilterMode_IdMask;
 	CAN_FilterInitStructure.CAN_FilterScale = CAN_FilterScale_32bit;
@@ -67,32 +61,37 @@ void InitCAN(void)
 	CAN_FilterInitStructure.CAN_FilterActivation = ENABLE;
 	CAN_FilterInit(&CAN_FilterInitStructure);
 
-	/* Transmit Structure preparation */
-	TxMessage.StdId = 0x321;
-	TxMessage.ExtId = 0x01;
-	TxMessage.RTR = CAN_RTR_DATA;
-	TxMessage.IDE = CAN_ID_STD;
-	TxMessage.DLC = 1;
-
 	/* Enable FIFO 0 message pending Interrupt */
 	CAN_ITConfig(CAN1, CAN_IT_FMP0, ENABLE);
-	
-	
-	Init_RxMes(&msgRx);
 }
 
-/*
-CAN RX Interrupt
-*/
+// CAN Transmit
+uint8_t CANTx(uint32_t address, uint8_t length, uint8_t data[8]) {
+	
+	CanTxMsg msg;	  
+	msg.StdId 	= address;
+	msg.IDE 	= CAN_Id_Standard;
+	msg.RTR		= CAN_RTR_Data;
+	msg.DLC		= length;
+	
+	uint8_t i = 0;
+	for(i=0; i<length; i++){
+		msg.Data[i] = data[i];
+	}
+
+	return CAN_Transmit(CAN1, &msg);
+}
+
+// CAN Receive
 void CAN1_RX0_IRQHandler (void)
 {
 	__disable_irq();
 	if (CAN_GetITStatus(CAN1,CAN_IT_FMP0) != RESET)
-		{
-			CANparseMessage(CAN_FIFO0);
-			RxCAN.FIFO0 = SET;
-			GPIOA->ODR ^= GPIO_Pin_5;
-			
-		}
-		__enable_irq();
+	{
+		CANparseMessage(CAN_FIFO0);
+		RxCAN.FIFO0 = SET;
+		GPIOA->ODR ^= GPIO_Pin_5;
+		
+	}
+	__enable_irq();
 }
